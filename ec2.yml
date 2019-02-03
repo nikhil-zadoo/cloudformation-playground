@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Ec2 Stack
+
+Resources:
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: "cf-demo"
+      DisableApiTermination: false
+      ImageId: "ami-035be7bafff33b6b6"
+      InstanceType: "t2.micro"
+      Monitoring: true
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          GroupSet: 
+            - Fn::ImportValue: Netowrk-SecurityGroup
+          SubnetId: 
+            Fn::ImportValue: Network-Subnet1
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash -x
+          yum install httpd -y
+          systemctl enable httpd
+          systemctl start httpd
+        
+      Tags:
+        - Key: Name
+          Value: CF
